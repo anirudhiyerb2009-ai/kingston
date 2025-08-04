@@ -1,0 +1,37 @@
+workflows:
+  react-native-ios-free-dev:
+    name: Build iOS (Manual Signing, Free Dev Account)
+    max_build_duration: 60
+    environment:
+      vars:
+        APP_NAME: "Kingston"
+        BUNDLE_ID: "com.anirudh.kingston" # replace with your actual bundle ID
+        APPLE_ID: "anirudhiyer2009@gmail.com"         # your Apple ID
+        TEAM_ID: "XXXXXXXXXX"              # your Apple Team ID from developer account
+      node: latest
+      xcode: latest
+      cocoapods: default
+    triggering:
+      events:
+        - push
+    scripts:
+      - name: Install Node and Cocoapods dependencies
+        script: |
+          npm install
+          cd ios
+          pod install
+      - name: Build iOS Debug .app (no codesign)
+        script: |
+          cd ios
+          xcodebuild \
+            -workspace Kingston.xcworkspace \
+            -scheme Kingston \
+            -configuration Debug \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            BUILD_DIR=build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+    artifacts:
+      - ios/build/Debug-iphoneos/*.app
