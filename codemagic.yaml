@@ -34,41 +34,9 @@ workflows:
           cp -R ios/App/build/App.xcarchive/Products/Applications/App.app ios/App/build/app_folder/
 
       # Optional: Keep your export unsigned IPA step (may fail without signing)
-      - name: Export unsigned IPA file (may fail)
-        script: |
-          cd ios/App
-          cat <<EOF > exportOptions.plist
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>release-testing</string>
-            <key>signingStyle</key>
-            <string>manual</string>
-            <key>stripSwiftSymbols</key>
-            <true/>
-            <key>compileBitcode</key>
-            <false/>
-            <key>destination</key>
-            <string>export</string>
-            <key>teamID</key>
-            <string>Y36C79F763</string>
-            <key>thinning</key>
-            <string>&lt;none&gt;</string>
-          </dict>
-          </plist>
-          EOF
-
-          xcodebuild -exportArchive -archivePath $PWD/build/App.xcarchive \
-            -exportOptionsPlist exportOptions.plist -exportPath $PWD/build \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
-
+      
     artifacts:
-      - ios/App/build/app_folder/App.app/**   # <- your downloaded .app folder here
-      - ios/App/build/*.ipa                   # Optional IPA if export works
-
-    publishing:
+      - ios/App/build/app_folder/App.app/**   # <- your downloaded .app folder here    
       email:
         recipients:
           - anirudhiyer2009@gmail.com
