@@ -16,18 +16,20 @@ workflows:
       - name: Sync Capacitor and install pods
         script: |
           npx cap sync ios
-          cd ios
-          # Ensure Podfile exists; Capacitor should generate one
+          cd ios/App
+
+          # Manually create Podfile if not generated
           if [ ! -f Podfile ]; then
-            cat <<EOF > Podfile
-            platform :ios, '13.0'
-            target 'App' do
-              use_frameworks!
-              pod 'Capacitor'
-              pod 'CapacitorCordova'
-            end
-            EOF
+cat <<EOF > Podfile
+platform :ios, '13.0'
+use_frameworks!
+target 'App' do
+  pod 'Capacitor'
+  pod 'CapacitorCordova'
+end
+EOF
           fi
+
           pod install
 
       - name: Build iOS archive (unsigned)
