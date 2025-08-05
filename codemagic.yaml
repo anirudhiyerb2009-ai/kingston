@@ -7,7 +7,7 @@ workflows:
         APP_NAME: "Kingston"
         BUNDLE_ID: "com.anirudh.kingston" # replace with your actual bundle ID
         APPLE_ID: "anirudhiyer2009@gmail.com"         # your Apple ID
-        TEAM_ID: "XXXXXXXXXX"              # your Apple Team ID from developer account
+        TEAM_ID: "Y36C79F763"              # your Apple Team ID from developer account
       node: latest
       xcode: latest
       cocoapods: default
