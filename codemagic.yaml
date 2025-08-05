@@ -1,6 +1,6 @@
 workflows:
   ios-build:
-    name: Build iOS app (Capacitor React, archive only)
+    name: Build iOS project (Capacitor React, unsigned)
     max_build_duration: 30
     environment:
       node: latest
@@ -13,21 +13,20 @@ workflows:
       - name: Build React web app
         script: npm run build
 
-      - name: Sync Capacitor and install pods
+      - name: Sync Capacitor iOS project and install pods
         script: |
           npx cap sync ios
           cd ios/App
           pod install
 
-      - name: Build iOS archive (unsigned)
+      - name: Build Xcode workspace (no archive, no export)
         script: |
           cd ios/App
           xcodebuild clean -workspace App.xcworkspace -scheme App -configuration Release \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
-            -archivePath $PWD/build/App.xcarchive archive
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
 
     artifacts:
-      - ios/App/build/*.xcarchive
+      - ios/App/**
 
 
 
