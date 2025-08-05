@@ -3,36 +3,31 @@ workflows:
     name: iOS Kingston Build
     max_build_duration: 60
     environment:
-      node: latest
-      ruby: latest
-      cocoapods_cache_enabled: true
-      flutter: none
-      xcode: latest
-      vars:
-        NODE_ENV: development
+      node: 20.6.1
+      ruby: 3.3.0
+      xcode: 16.4
+    cache:
+      cocoapods: true
+      npm: true
     scripts:
-      - name: Install node dependencies
-        script: npm install
-      - name: Install pods
+      - name: Install Node dependencies
+        script: npm ci
+      - name: Install CocoaPods dependencies
         script: |
           cd ios
           pod repo update
           pod install
-      - name: Build iOS app
+      - name: Build iOS app and export IPA
         script: |
           cd ios
-          xcodebuild \
-            -workspace Kingston.xcworkspace \
-            -scheme Kingston \
-            -configuration Debug \
-            -sdk iphoneos \
-            -derivedDataPath build \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGNING_ALLOWED=NO
+          xcodebuild clean -workspace Kingston.xcworkspace -scheme Kingston -configuration Release
+          xcodebuild -workspace Kingston.xcworkspace -scheme Kingston -configuration Release -sdk iphoneos \
+            -archivePath $PWD/build/Kingston.xcarchive archive
+          xcodebuild -exportArchive -archivePath $PWD/build/Kingston.xcarchive \
+            -exportOptionsPlist exportOptions.plist -exportPath $PWD/build
     artifacts:
-      - ios/build/Build/Products/Debug-iphoneos/Kingston.app
-      - ios/build/Build/Products/Debug-iphoneos/Kingston.ipa
+      - ios/build/Kingston.ipa
+      - ios/build/Kingston.xcarchive
 
 
 
