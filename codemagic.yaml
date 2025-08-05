@@ -1,13 +1,7 @@
 workflows:
   react-native-ios-free-dev:
     name: Build iOS (Manual Signing, Free Dev Account)
-    max_build_duration: 60
     environment:
-      vars:
-        APP_NAME: "Kingston"
-        BUNDLE_ID: "com.anirudh.kingston"
-        APPLE_ID: "anirudhiyer2009@gmail.com"
-        TEAM_ID: "Y36C79F763"
       node: latest
       xcode: latest
       cocoapods: default
@@ -18,13 +12,12 @@ workflows:
 
     scripts:
       - name: Install Node dependencies
-        script: |
-          npm install
+        script: npm install
 
-      - name: Install CocoaPods and generate .xcworkspace
+      - name: Install CocoaPods
         script: |
           cd ios
-          pod install
+          pod install --verbose || (cat Podfile.lock && exit 1)
           cd ..
 
       - name: Build iOS Debug .app (no codesign)
@@ -41,6 +34,4 @@ workflows:
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
 
-    artifacts:
-      - ios/build/Debug-iphoneos/*.app
 
