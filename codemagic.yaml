@@ -1,36 +1,28 @@
 workflows:
-  ios-build:
-    name: Build iOS app (Capacitor React)
+  unsigned-ipa-build:
+    name: Build unsigned iOS IPA
+    max_build_duration: 30
+    instance_type: mac_mini_m2
     environment:
-      node: latest
-      ruby: default
+      vars:
+        APP_NAME: "Kingston"
       xcode: latest
       cocoapods: default
+      ruby: 3.3.6
     scripts:
-      - name: Install Node dependencies
-        script: npm ci
-      - name: Build React web app
-        script: npm run build
-      - name: Sync Capacitor iOS
-        script: npx cap sync ios
-      - name: Build iOS app archive
+      - name: Install dependencies
         script: |
-          cd ios/App
-          xcodebuild clean -workspace App.xcworkspace -scheme App -configuration Release
-          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -sdk iphoneos \
-            -archivePath $PWD/build/App.xcarchive archive
-      - name: Export IPA
+          npm ci
+          npx cap sync ios
+      - name: Build iOS project
         script: |
-          cd ios/App
-          xcodebuild -exportArchive -archivePath $PWD/build/App.xcarchive \
-            -exportOptionsPlist ../exportOptions.plist \
-            -exportPath $PWD/build
+          cd ios
+          pod install
+          xcodebuild -workspace App.xcworkspace -scheme App -sdk iphoneos -configuration Release archive -archivePath $PWD/build/App.xcarchive CODE_SIGNING_ALLOWED=NO
+          xcodebuild -exportArchive -archivePath $PWD/build/App.xcarchive -exportOptionsPlist exportOptions.plist -exportPath $PWD/build
     artifacts:
-      - ios/App/build/*.ipa
-    publishing:
-      email:
-        recipients:
-          - anirudhiyer2009@gmail.com
+      - ios/build/*.ipa
+
 
 
 
