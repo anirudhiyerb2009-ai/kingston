@@ -1,41 +1,34 @@
-cache_paths:
-  - ~/.npm
-  - ~/.cocoapods
-  - ios/Pods
-  - ios/build
-
 workflows:
-  ios-build:
-    name: Build iOS app
+  build_ios_capacitor:
+    name: Build iOS IPA (Capacitor)
     environment:
-      ruby: 3.3.6
       xcode: latest
-      cocoapods: default
-      vars:
-        NODE_ENV: development
-
+      node: 18.18.0
     scripts:
-      - name: Install Node dependencies
-        script: npm ci
-
-      - name: Install CocoaPods
-        script: gem install cocoapods
-
-      - name: Pod install
+      - name: Install dependencies
+        script: |
+          npm install
+      - name: Add iOS platform
+        script: |
+          npx cap sync ios
+      - name: Build web app
+        script: |
+          npm run build
+      - name: Copy web build to iOS
+        script: |
+          npx cap copy ios
+      - name: Build IPA
         script: |
           cd ios
-          pod install --repo-update
-          cd ..
-
-      - name: Build and export IPA
-        script: |
-          cd ios
-          xcodebuild clean -workspace Kingston.xcworkspace -scheme Kingston -configuration Release
-          xcodebuild -workspace Kingston.xcworkspace -scheme Kingston -configuration Release -sdk iphoneos \
-            -archivePath $PWD/build/Kingston.xcarchive archive
-          xcodebuild -exportArchive -archivePath $PWD/build/Kingston.xcarchive \
-            -exportOptionsPlist exportOptions.plist -exportPath $PWD/build
-
+          xcodebuild -workspace App.xcworkspace \
+            -scheme App \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath build/App.xcarchive archive
+          xcodebuild -exportArchive \
+            -archivePath build/App.xcarchive \
+            -exportOptionsPlist exportOptions.plist \
+            -exportPath build
     artifacts:
       - ios/build/*.ipa
 
