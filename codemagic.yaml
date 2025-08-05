@@ -1,4 +1,3 @@
-# .codemagic.yaml for unsigned IPA export
 workflows:
   ios-build-unsigned:
     name: Build Unsigned IPA for Kingston (Capacitor React)
@@ -29,7 +28,13 @@ workflows:
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
             -archivePath $PWD/build/App.xcarchive archive
 
-      - name: Export unsigned IPA file
+      - name: Copy .app folder as artifact
+        script: |
+          mkdir -p ios/App/build/app_folder
+          cp -R ios/App/build/App.xcarchive/Products/Applications/App.app ios/App/build/app_folder/
+
+      # Optional: Keep your export unsigned IPA step (may fail without signing)
+      - name: Export unsigned IPA file (may fail)
         script: |
           cd ios/App
           cat <<EOF > exportOptions.plist
@@ -54,13 +59,15 @@ workflows:
           </dict>
           </plist>
           EOF
-          
-                    xcodebuild -exportArchive -archivePath $PWD/build/App.xcarchive \
-                      -exportOptionsPlist exportOptions.plist -exportPath $PWD/build \
-                      CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+
+          xcodebuild -exportArchive -archivePath $PWD/build/App.xcarchive \
+            -exportOptionsPlist exportOptions.plist -exportPath $PWD/build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
 
     artifacts:
-      - ios/App/build/*.ipa
+      - ios/App/build/app_folder/App.app/**   # <- your downloaded .app folder here
+      - ios/App/build/*.ipa                   # Optional IPA if export works
+
     publishing:
       email:
         recipients:
@@ -68,6 +75,7 @@ workflows:
         notify:
           success: true
           failure: true
+
 
 
 
