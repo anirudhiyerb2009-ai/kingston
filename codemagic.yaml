@@ -1,36 +1,36 @@
 workflows:
-  build_ios_capacitor:
-    name: Build iOS IPA (Capacitor)
+  ios-build:
+    name: Build iOS app (Capacitor React)
     environment:
+      node: latest
+      ruby: default
       xcode: latest
-      node: 18.18.0
+      cocoapods: default
     scripts:
-      - name: Install dependencies
+      - name: Install Node dependencies
+        script: npm ci
+      - name: Build React web app
+        script: npm run build
+      - name: Sync Capacitor iOS
+        script: npx cap sync ios
+      - name: Build iOS app archive
         script: |
-          npm install
-      - name: Add iOS platform
+          cd ios/App
+          xcodebuild clean -workspace App.xcworkspace -scheme App -configuration Release
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -sdk iphoneos \
+            -archivePath $PWD/build/App.xcarchive archive
+      - name: Export IPA
         script: |
-          npx cap sync ios
-      - name: Build web app
-        script: |
-          npm run build
-      - name: Copy web build to iOS
-        script: |
-          npx cap copy ios
-      - name: Build IPA
-        script: |
-          cd ios
-          xcodebuild -workspace App.xcworkspace \
-            -scheme App \
-            -sdk iphoneos \
-            -configuration Release \
-            -archivePath build/App.xcarchive archive
-          xcodebuild -exportArchive \
-            -archivePath build/App.xcarchive \
-            -exportOptionsPlist exportOptions.plist \
-            -exportPath build
+          cd ios/App
+          xcodebuild -exportArchive -archivePath $PWD/build/App.xcarchive \
+            -exportOptionsPlist ../exportOptions.plist \
+            -exportPath $PWD/build
     artifacts:
-      - ios/build/*.ipa
+      - ios/App/build/*.ipa
+    publishing:
+      email:
+        recipients:
+          - anirudhiyer2009@gmail.com
 
 
 
