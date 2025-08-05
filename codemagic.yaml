@@ -1,3 +1,4 @@
+# .codemagic.yaml for unsigned IPA export
 workflows:
   ios-build-unsigned:
     name: Build Unsigned IPA for Kingston (Capacitor React)
@@ -36,16 +37,16 @@ workflows:
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>compileBitcode</key>
-  <false/>
-  <key>destination</key>
-  <string>export</string>
   <key>method</key>
-  <string>release-testing</string>
+  <string>developer-id</string>
   <key>signingStyle</key>
   <string>manual</string>
   <key>stripSwiftSymbols</key>
   <true/>
+  <key>compileBitcode</key>
+  <false/>
+  <key>destination</key>
+  <string>export</string>
   <key>teamID</key>
   <string>Y36C79F763</string>
   <key>thinning</key>
