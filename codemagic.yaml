@@ -18,11 +18,13 @@ workflows:
       - name: Install Node dependencies (root)
         script: |
           npm install
+          ls -la node_modules/react-native/scripts
 
       - name: Install CocoaPods dependencies (ios)
         script: |
           cd ios
-          pod install --verbose
+          pod install --verbose || (cat Podfile.lock && exit 1)
+          ls -la *.xcworkspace
           cd ..
 
       - name: Build iOS Debug .app (no codesign)
@@ -40,6 +42,7 @@ workflows:
             CODE_SIGNING_ALLOWED=NO
     artifacts:
       - ios/build/Debug-iphoneos/*.app
+
 
 
 
