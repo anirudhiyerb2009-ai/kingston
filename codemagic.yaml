@@ -8,10 +8,11 @@ workflows:
       xcode: latest
       cocoapods: default
       flutter: none
-      cache:
-        # Only cache default folders
-        - ~/.npm
-        - ~/.cocoapods
+    cache_paths:
+      - ~/.npm
+      - ~/.cocoapods
+      - ios/Pods
+      - ios/build
     scripts:
       - name: Install Node dependencies
         script: npm ci
@@ -33,6 +34,7 @@ workflows:
             -exportOptionsPlist exportOptions.plist -exportPath $PWD/build
     artifacts:
       - ios/build/*.ipa
+
 
 
 
