@@ -1,6 +1,6 @@
 workflows:
-  ios-build:
-    name: Build iOS project (Capacitor React, unsigned)
+  ios-unsigned-ipa:
+    name: Build Unsigned IPA (Capacitor React)
     max_build_duration: 30
     environment:
       node: latest
@@ -10,23 +10,62 @@ workflows:
       - name: Install Node dependencies
         script: npm ci
 
-      - name: Build React web app
+      - name: Build Web App
         script: npm run build
 
-      - name: Sync Capacitor iOS project and install pods
+      - name: Sync Capacitor + Install CocoaPods
         script: |
           npx cap sync ios
           cd ios/App
           pod install
 
-      - name: Build Xcode workspace (no archive, no export)
+      - name: Build XCArchive (no signing)
         script: |
           cd ios/App
-          xcodebuild clean -workspace App.xcworkspace -scheme App -configuration Release \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+          xcodebuild -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath $PWD/build/App.xcarchive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            archive
+
+      - name: Export Unsigned IPA
+        script: |
+          cd ios/App
+          cat <<EOF > exportOptions.plist
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>ad-hoc</string>
+            <key>signingStyle</key>
+            <string>manual</string>
+            <key>stripSwiftSymbols</key>
+            <true/>
+            <key>compileBitcode</key>
+            <false/>
+            <key>destination</key>
+            <string>export</string>
+            <key>thinning</key>
+            <string>&lt;none&gt;</string>
+          </dict>
+          </plist>
+          EOF
+
+          xcodebuild -exportArchive \
+            -archivePath $PWD/build/App.xcarchive \
+            -exportOptionsPlist exportOptions.plist \
+            -exportPath $PWD/build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
 
     artifacts:
-      - ios/App/**
+      - ios/App/build/*.ipa
 
 
 
