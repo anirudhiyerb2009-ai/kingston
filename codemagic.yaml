@@ -13,18 +13,22 @@ workflows:
       ruby: 3.3.6
       xcode: latest
       cocoapods: default
+
     scripts:
       - name: Install Node dependencies
-        script: |
-          npm ci
+        script: npm ci
+
       - name: Setup Ruby and install CocoaPods
         script: |
           rbenv global 3.3.6
           gem install cocoapods
+
       - name: Install CocoaPods dependencies
         script: |
           cd ios
           pod install --repo-update
+          cd ..
+
       - name: Build iOS app and export IPA
         script: |
           cd ios
@@ -33,9 +37,9 @@ workflows:
             -archivePath $PWD/build/Kingston.xcarchive archive
           xcodebuild -exportArchive -archivePath $PWD/build/Kingston.xcarchive \
             -exportOptionsPlist exportOptions.plist -exportPath $PWD/build
+
     artifacts:
       - ios/build/*.ipa
-
 
 
 
