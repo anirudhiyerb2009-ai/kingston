@@ -2,14 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-  <key>compileBitcode</key>
-  <false/>
-  <key>destination</key>
-  <string>export</string>
   <key>method</key>
-  <string>development</string>
+  <string>development</string>  <!-- or "ad-hoc" -->
   <key>signingStyle</key>
   <string>manual</string>
+  <key>teamID</key>
+  <string>Y36C79F763</string>
+  <key>compileBitcode</key>
+  <false/>
   <key>stripSwiftSymbols</key>
   <true/>
 </dict>
