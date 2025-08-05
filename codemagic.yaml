@@ -14,11 +14,11 @@ workflows:
       - name: Install Node dependencies
         script: npm install
 
-      - name: Install CocoaPods
-        script: |
-          cd ios
+      - name: Install CocoaPods dependencies
+         script: |
+             cd ios
           pod install --verbose || (cat Podfile.lock && exit 1)
-          cd ..
+              cd ..
 
       - name: Build iOS Debug .app (no codesign)
         script: |
