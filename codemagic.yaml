@@ -15,20 +15,20 @@ workflows:
       events:
         - push
     scripts:
-      - name: Install Node dependencies
+      - name: Install Node dependencies (root)
         script: |
+          echo "Installing node modules at root"
           npm install
+          echo "Check react-native scripts folder:"
+          ls -la node_modules/react-native/scripts
 
-      - name: Install CocoaPods dependencies (with debug)
+      - name: Install CocoaPods dependencies (ios)
         script: |
+          echo "Installing CocoaPods dependencies inside ios folder"
           cd ios
-          echo "=== Podfile contents ==="
-          cat Podfile
-          echo "=== Running pod install ==="
-          pod install --verbose || (echo "Pod install failed. Podfile.lock contents:"; cat Podfile.lock; exit 1)
-          echo "=== Pod install succeeded ==="
-          echo "=== Workspace files in ios directory ==="
-          ls -la *.xcworkspace || echo "No .xcworkspace files found"
+          pod install --verbose || (echo "Pod install failed, Podfile.lock:"; cat Podfile.lock; exit 1)
+          echo "Check for generated workspace:"
+          ls -la *.xcworkspace || echo "No .xcworkspace file found"
           cd ..
 
       - name: Build iOS Debug .app (no codesign)
@@ -44,8 +44,10 @@ workflows:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGNING_ALLOWED=NO
+
     artifacts:
       - ios/build/Debug-iphoneos/*.app
+
 
 
 
