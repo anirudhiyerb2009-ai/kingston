@@ -1,38 +1,35 @@
+# .codemagic.yaml for unsigned IPA export
 workflows:
-  ios-unsigned-ipa:
-    name: Build Unsigned IPA (Capacitor React)
+  ios-build-unsigned:
+    name: Build Unsigned IPA for Kingston (Capacitor React)
     max_build_duration: 30
     environment:
       node: latest
       ruby: default
       xcode: latest
     scripts:
-      - name: Install Node dependencies
-        script: npm ci
+      - name: Install dependencies
+        script: |
+          npm ci
 
-      - name: Build Web App
-        script: npm run build
+      - name: Build React app
+        script: |
+          npm run build
 
-      - name: Sync Capacitor + Install CocoaPods
+      - name: Sync Capacitor and install CocoaPods
         script: |
           npx cap sync ios
           cd ios/App
           pod install
 
-      - name: Build XCArchive (no signing)
+      - name: Build unsigned Xcode archive
         script: |
           cd ios/App
-          xcodebuild -workspace App.xcworkspace \
-            -scheme App \
-            -configuration Release \
-            -sdk iphoneos \
-            -archivePath $PWD/build/App.xcarchive \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
-            archive
+          xcodebuild clean -workspace App.xcworkspace -scheme App -configuration Release \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            -archivePath $PWD/build/App.xcarchive archive
 
-      - name: Export Unsigned IPA
+      - name: Export unsigned IPA file
         script: |
           cd ios/App
           cat <<EOF > exportOptions.plist
@@ -41,7 +38,7 @@ workflows:
           <plist version="1.0">
           <dict>
             <key>method</key>
-            <string>ad-hoc</string>
+            <string>developer-id</string>
             <key>signingStyle</key>
             <string>manual</string>
             <key>stripSwiftSymbols</key>
@@ -50,22 +47,27 @@ workflows:
             <false/>
             <key>destination</key>
             <string>export</string>
+            <key>teamID</key>
+            <string>Y36C79F763</string>
             <key>thinning</key>
             <string>&lt;none&gt;</string>
           </dict>
           </plist>
           EOF
 
-          xcodebuild -exportArchive \
-            -archivePath $PWD/build/App.xcarchive \
-            -exportOptionsPlist exportOptions.plist \
-            -exportPath $PWD/build \
-            CODE_SIGNING_ALLOWED=NO \
-            CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY=""
+          xcodebuild -exportArchive -archivePath $PWD/build/App.xcarchive \
+            -exportOptionsPlist exportOptions.plist -exportPath $PWD/build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
 
     artifacts:
       - ios/App/build/*.ipa
+    publishing:
+      email:
+        recipients:
+          - anirudhiyer2009@gmail.com
+        notify:
+          success: true
+          failure: true
 
 
 
