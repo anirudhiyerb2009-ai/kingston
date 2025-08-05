@@ -38,7 +38,7 @@ workflows:
           <plist version="1.0">
           <dict>
             <key>method</key>
-            <string>developer-id</string>
+            <string>release-testing</string>
             <key>signingStyle</key>
             <string>manual</string>
             <key>stripSwiftSymbols</key>
