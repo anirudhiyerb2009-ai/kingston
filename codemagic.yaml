@@ -18,9 +18,8 @@ workflows:
       - name: Install Node dependencies
         script: npm ci
 
-      - name: Setup CocoaPods
-        script: |
-          gem install cocoapods
+      - name: Install CocoaPods
+        script: gem install cocoapods
 
       - name: Pod install
         script: |
@@ -28,7 +27,7 @@ workflows:
           pod install --repo-update
           cd ..
 
-      - name: Build & Export
+      - name: Build and export IPA
         script: |
           cd ios
           xcodebuild clean -workspace Kingston.xcworkspace -scheme Kingston -configuration Release
@@ -36,10 +35,9 @@ workflows:
             -archivePath $PWD/build/Kingston.xcarchive archive
           xcodebuild -exportArchive -archivePath $PWD/build/Kingston.xcarchive \
             -exportOptionsPlist exportOptions.plist -exportPath $PWD/build
+
     artifacts:
       - ios/build/*.ipa
-
-
 
 
 
