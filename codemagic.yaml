@@ -37,7 +37,7 @@ workflows:
       
     artifacts:
       - ios/App/build/app_folder/App.app/**   # <- your downloaded .app folder here    
-      email:
+    email:
         recipients:
           - anirudhiyer2009@gmail.com
         notify:
