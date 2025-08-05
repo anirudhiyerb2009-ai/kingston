@@ -1,27 +1,51 @@
 workflows:
-  unsigned-ipa-build:
-    name: Build unsigned iOS IPA
+  ios-build:
+    name: Build iOS app (Capacitor React, unsigned)
     max_build_duration: 30
-    instance_type: mac_mini_m2
     environment:
-      vars:
-        APP_NAME: "Kingston"
+      node: latest
+      ruby: default
       xcode: latest
-      cocoapods: default
-      ruby: 3.3.6
     scripts:
-      - name: Install dependencies
+      - name: Install Node dependencies
+        script: npm ci
+
+      - name: Build React web app
+        script: npm run build
+
+      - name: Sync Capacitor and install pods
         script: |
-          npm ci
           npx cap sync ios
-      - name: Build iOS project
-        script: |
           cd ios
+          # Ensure Podfile exists; Capacitor should generate one
+          if [ ! -f Podfile ]; then
+            cat <<EOF > Podfile
+            platform :ios, '13.0'
+            target 'App' do
+              use_frameworks!
+              pod 'Capacitor'
+              pod 'CapacitorCordova'
+            end
+            EOF
+          fi
           pod install
-          xcodebuild -workspace App.xcworkspace -scheme App -sdk iphoneos -configuration Release archive -archivePath $PWD/build/App.xcarchive CODE_SIGNING_ALLOWED=NO
-          xcodebuild -exportArchive -archivePath $PWD/build/App.xcarchive -exportOptionsPlist exportOptions.plist -exportPath $PWD/build
+
+      - name: Build iOS archive (unsigned)
+        script: |
+          cd ios/App
+          xcodebuild clean -workspace App.xcworkspace -scheme App -configuration Release \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            -archivePath $PWD/build/App.xcarchive archive
+
+      - name: Export unsigned IPA
+        script: |
+          cd ios/App
+          xcodebuild -exportArchive -archivePath $PWD/build/App.xcarchive \
+            -exportOptionsPlist ../exportOptions.plist -exportPath $PWD/build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+
     artifacts:
-      - ios/build/*.ipa
+      - ios/App/build/*.ipa
 
 
 
