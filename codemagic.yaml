@@ -8,10 +8,12 @@ workflows:
       xcode: latest
     scripts:
       - name: Install Node dependencies
-        script: npm ci
+        script: |
+          npm ci
 
       - name: Build React web app
-        script: npm run build
+        script: |
+          npm run build
 
       - name: Sync Capacitor and install pods
         script: |
@@ -20,14 +22,12 @@ workflows:
 
           # Manually create Podfile if not generated
           if [ ! -f Podfile ]; then
-cat <<EOF > Podfile
-platform :ios, '13.0'
-use_frameworks!
-target 'App' do
-  pod 'Capacitor'
-  pod 'CapacitorCordova'
-end
-EOF
+            echo "platform :ios, '13.0'" > Podfile
+            echo "use_frameworks!" >> Podfile
+            echo "target 'App' do" >> Podfile
+            echo "  pod 'Capacitor'" >> Podfile
+            echo "  pod 'CapacitorCordova'" >> Podfile
+            echo "end" >> Podfile
           fi
 
           pod install
@@ -48,10 +48,6 @@ EOF
 
     artifacts:
       - ios/App/build/*.ipa
-
-
-
-
 
 
 
