@@ -6,9 +6,11 @@ workflows:
       node: 20.6.1
       ruby: 3.3.0
       xcode: 16.4
-    cache:
-      cocoapods: true
-      npm: true
+    cache_paths:
+      - ~/.cocoapods
+      - ~/.npm
+      - ios/Pods
+      - node_modules
     scripts:
       - name: Install Node dependencies
         script: npm ci
