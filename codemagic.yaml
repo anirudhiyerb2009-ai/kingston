@@ -1,10 +1,3 @@
-cache:
-  paths:
-    - ~/.npm
-    - ~/.cocoapods
-    - ios/Pods
-    - ios/build
-
 workflows:
   ios-build:
     name: Build iOS app
@@ -15,6 +8,12 @@ workflows:
       xcode: latest
       cocoapods: default
       flutter: none
+      cache:
+        paths:
+          - ~/.npm
+          - ~/.cocoapods
+          - ios/Pods
+          - ios/build
     scripts:
       - name: Install Node dependencies
         script: npm ci
