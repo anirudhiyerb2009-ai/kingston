@@ -8,28 +8,15 @@ workflows:
       xcode: latest
     scripts:
       - name: Install Node dependencies
-        script: |
-          npm ci
+        script: npm ci
 
       - name: Build React web app
-        script: |
-          npm run build
+        script: npm run build
 
       - name: Sync Capacitor and install pods
         script: |
           npx cap sync ios
           cd ios/App
-
-          # Manually create Podfile if not generated
-          if [ ! -f Podfile ]; then
-            echo "platform :ios, '13.0'" > Podfile
-            echo "use_frameworks!" >> Podfile
-            echo "target 'App' do" >> Podfile
-            echo "  pod 'Capacitor'" >> Podfile
-            echo "  pod 'CapacitorCordova'" >> Podfile
-            echo "end" >> Podfile
-          fi
-
           pod install
 
       - name: Build iOS archive (unsigned)
