@@ -19,10 +19,16 @@ workflows:
         script: |
           npm install
 
-      - name: Install CocoaPods dependencies
+      - name: Install CocoaPods dependencies (with debug)
         script: |
           cd ios
-          pod install --verbose || (cat Podfile.lock && exit 1)
+          echo "=== Podfile contents ==="
+          cat Podfile
+          echo "=== Running pod install ==="
+          pod install --verbose || (echo "Pod install failed. Podfile.lock contents:"; cat Podfile.lock; exit 1)
+          echo "=== Pod install succeeded ==="
+          echo "=== Workspace files in ios directory ==="
+          ls -la *.xcworkspace || echo "No .xcworkspace files found"
           cd ..
 
       - name: Build iOS Debug .app (no codesign)
@@ -40,5 +46,6 @@ workflows:
             CODE_SIGNING_ALLOWED=NO
     artifacts:
       - ios/build/Debug-iphoneos/*.app
+
 
 
