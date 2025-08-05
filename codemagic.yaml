@@ -8,28 +8,27 @@ workflows:
   ios-build:
     name: Build iOS app
     environment:
-      vars:
-        NODE_ENV: development
       ruby: 3.3.6
       xcode: latest
       cocoapods: default
+      vars:
+        NODE_ENV: development
 
     scripts:
       - name: Install Node dependencies
         script: npm ci
 
-      - name: Setup Ruby and install CocoaPods
+      - name: Setup CocoaPods
         script: |
-          rbenv global 3.3.6
           gem install cocoapods
 
-      - name: Install CocoaPods dependencies
+      - name: Pod install
         script: |
           cd ios
           pod install --repo-update
           cd ..
 
-      - name: Build iOS app and export IPA
+      - name: Build & Export
         script: |
           cd ios
           xcodebuild clean -workspace Kingston.xcworkspace -scheme Kingston -configuration Release
@@ -37,9 +36,9 @@ workflows:
             -archivePath $PWD/build/Kingston.xcarchive archive
           xcodebuild -exportArchive -archivePath $PWD/build/Kingston.xcarchive \
             -exportOptionsPlist exportOptions.plist -exportPath $PWD/build
-
     artifacts:
       - ios/build/*.ipa
+
 
 
 
