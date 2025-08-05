@@ -1,5 +1,6 @@
 platform :ios, '12.0'
 
+require_relative '../node_modules/react-native/scripts/react_native_pods.rb'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 target 'Kingston' do
@@ -15,7 +16,8 @@ target 'Kingston' do
     # Pods for testing
   end
 
-  use_flipper!()
+  # Enables Flipper debugging tool - keep version compatible with your RN version
+  use_flipper!({ 'Flipper' => '0.125.0' })
 
   post_install do |installer|
     react_native_post_install(installer)
