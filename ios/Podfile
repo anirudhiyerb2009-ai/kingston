@@ -1,8 +1,5 @@
 platform :ios, '12.0'
 
-# Remove invalid script require, since RN scripts may not exist
-# require_relative '../node_modules/react-native/scripts/react_native_pods.rb'
-
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 target 'Kingston' do
@@ -17,10 +14,10 @@ target 'Kingston' do
     inherit! :complete
   end
 
-  # Remove or adjust flipper if not supported
   use_flipper!({ 'Flipper' => '0.125.0' })
 
   post_install do |installer|
     react_native_post_install(installer)
   end
 end
+
