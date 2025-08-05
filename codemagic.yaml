@@ -13,7 +13,6 @@ workflows:
       ruby: 3.3.6
       xcode: latest
       cocoapods: default
-      flutter: none
     scripts:
       - name: Install Node dependencies
         script: npm ci
@@ -35,6 +34,7 @@ workflows:
             -exportOptionsPlist exportOptions.plist -exportPath $PWD/build
     artifacts:
       - ios/build/*.ipa
+
 
 
 
