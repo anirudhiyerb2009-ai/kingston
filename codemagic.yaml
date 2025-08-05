@@ -6,11 +6,6 @@ workflows:
       node: 20.6.1
       ruby: 3.3.0
       xcode: 16.4
-    cache_paths:
-      - ~/.cocoapods
-      - ~/.npm
-      - ios/Pods
-      - node_modules
     scripts:
       - name: Install Node dependencies
         script: npm ci
@@ -30,6 +25,13 @@ workflows:
     artifacts:
       - ios/build/Kingston.ipa
       - ios/build/Kingston.xcarchive
+
+cache:
+  paths:
+    - ~/.cocoapods
+    - ~/.npm
+    - ios/Pods
+    - node_modules
 
 
 
